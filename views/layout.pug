@@ -1,0 +1,77 @@
+doctype html
+html
+  head
+    title= title
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src="/javascripts/modal.js")
+    script(src="/javascripts/usermenu.js")
+  body
+    header
+      div.header-container
+        div.header-title-container
+          h1
+            span.members Members
+            span.only Only
+        div.header-button-container
+          if user 
+            div.user-menu(onclick='toggleDropdown()')
+              span.user-name= user.name 
+              span.dropdown-arrow ▼
+              ul.dropdown-menu 
+                li 
+                  a(href='/') Home
+                li 
+                  a(href='/join-club') Become a Member 
+                li 
+                  a(href='/message-form') Create Message
+                li 
+                  a(href='/logout') Log Out
+          else 
+            button.header-button.login-button(onclick='openLoginModal()') Log In
+            button.header-button.signup-button(onclick='openModal()') Sign Up
+
+    // Signup HTML
+    div.modal(id='signupModal')
+      div.modal-content
+        span.close-button(onclick='closeModal()') &times;
+
+        // Display error messages, if any
+        if errors && errors.length > 0
+          ul.error-messages
+            each error in errors
+              li= error.msg
+          
+          // Script to automatically open the modal if there are errors
+          script.
+            document.addEventListener('DOMContentLoaded', function() {
+              openModal();
+            });
+
+        // Signup Form
+        form.signup-form(action='/sign-up' method='POST')
+          div.form-group
+            label(for='name') Name
+            input(type='text', name='name', id='name' placeholder='Name Here', value=(formData ? formData.name : ''), required=true)
+          div.form-group 
+            label(for='email') Email
+            input(type='email', name='email', id='email' placeholder='examplemail@mail.com', value=(formData ? formData.email : ''), required=true) 
+          div.form-group 
+            label(for='password') Password
+            input(type='password', name='password' id='password', required=true)
+          button.modal-button(type='submit') Sign Up
+
+    // Login Modal
+    div.modal(id='loginModal')  
+      div.modal-content 
+        span.close-button(onclick='closeLoginModal()') &times;
+        form.login-form(action='/login' method='POST')
+          div.form-group 
+            label(for='login-email') Email 
+            input(type='email', name='email', id='login-email', required=true)
+          div.form-group 
+            label(for='login-password') Password 
+            input(type='password', name='password', id='login-password', required=true)
+          button.modal-button(type='submit') Log In
+    block content
+

@@ -1,0 +1,23 @@
+extends layout 
+
+block content 
+  div.content-container 
+    if user 
+      p Welcome 
+        strong #{user.name}!
+    else 
+      p Welcome to the members only page!
+  
+    // Message display 
+    h1.messages-header Messages
+    each message in messages 
+      div.message 
+        h2 #{message.title} 
+        p #{message.message} 
+        if user && user.isMember 
+          // Show author and date for members 
+          p Posted by #{message.user.name} on #{message.formattedDate}
+        else 
+          // Show note for non-members 
+          p.note #[strong Note:] Become a member to know who wrote this message and when.
+  

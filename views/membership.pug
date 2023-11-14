@@ -1,0 +1,12 @@
+extends layout 
+
+block content 
+  div.content-container 
+    h1 Join the Club 
+    if error
+      p.error #{error}
+    form.join-club-form(action='/join-club' method='POST') 
+      div.form-group 
+        label(for='passcode') Enter Secret Passcode: 
+        input(type='password', name='passcode', id='passcode', required=true)
+      button.join-club-button(type='submit') Join

@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  background-color: #F5F5F5;
+  font-family: 'Nunito', sans-serif;
+}
+
+header {
+  background-color: #fff;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.members {
+  color: #4CAF50;
+}
+
+.only {
+  color: black;
+}
+
+.header-button-container {
+  display: flex;
+  gap: 15px;
+}
+
+.header-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.header-button:hover {
+  opacity: 0.8;
+}
+
+.login-button {
+  background-color: transparent;
+  color: #333;
+}
+
+.signup-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+h1 {
+  margin: 0;
+}
+
+/* MODAL WINDOWS */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place and above other items */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(128, 128, 128, 0.7); /* Light gray with semi-transparency */
+  z-index: 2; /* Above other items */
+  opacity: 0;
+}
+
+.modal.show {
+  display: block;
+  animation: fadeIn 0.3s forwards; /* Apply the fadeIn animation */
+}
+
+.modal.hide {
+  animation: fadeOut 0.3s forwards; /* Apply the fadeOut animation */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: auto; /* Center in the available space */
+  padding: 35px;
+  border: 1px solid #888;
+  border-radius: 5px;
+  width: 30%; /* Adjust width as needed for a smaller box */
+  position: relative; /* For absolute positioning of the close button */
+  top: 50%; /* Push down by half of the viewport height */
+  transform: translateY(-50%); /* Pull back up by half of its own height */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: for better visibility */
+}
+
+.close-button {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-button:hover, 
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.signup-form, .login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-group input {
+  border: 1px solid #aaa;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  height: 20px;
+  padding: 10px;
+}
+
+.form-group input:focus {
+  outline-color: #4CAF50;
+}
+
+.modal-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.modal-button:hover {
+  opacity: 0.8;
+}
+
+/* USER DROPDOWN MENU */
+.user-menu {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.dropdown-arrow {
+  margin-left: 5px;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-menu li a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+/* CONTENT */
+.content-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+p {
+  font-size: 18px;
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  padding: 15px;
+}
+
+/* MESSAGE FORM */
+.message-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.message-form-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* MESSAGES */
+.messages-header {
+  margin-bottom: 20px;
+}
+
+.message {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message h2 {
+  color: #333;
+  margin-top: 0;
+}
+
+.message p {
+  color: #666;
+  line-height: 1.5;
+}
+
+.message p:last-child {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.note {
+  font-size: 0.9em; /* Smaller font size */
+  color: #888; /* Lighter text color */
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+/* Join Club Page */
+.join-club-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.join-club-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #4CAF50;
+  color: white;
+}

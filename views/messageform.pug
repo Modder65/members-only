@@ -1,0 +1,14 @@
+extends layout 
+
+block content 
+  div.content-container
+    h1= title 
+    form.message-form(action='' method='POST') 
+      div.form-group 
+        label(for="title") Title
+        input(type='text', name='title', id='title', required=true) 
+      div.form-group 
+        label(for='message') Message
+        input(type='text', name='message', id='message', required=true) 
+      button.message-form-button(type='submit') Post Message
+
