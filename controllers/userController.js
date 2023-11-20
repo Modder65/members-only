@@ -125,6 +125,10 @@ export const join_club_get = (req, res) => {
 }
 
 export const join_club_post = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).send("User not authenticated");
+  }
+
   if (req.body.passcode === process.env.SECRET_PASSCODE) {
     try {
       await UserModel.findByIdAndUpdate(req.user._id, { isMember: true });
@@ -166,7 +170,19 @@ export const user_message_post = [
     .withMessage("Message must be specified."),
   
   asyncHandler(async (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).send("User not authenticated");
+    }
+
     const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render("messageform", {
+        title: "Post a Message",
+        user: req.user,
+        errors: errors.array(),
+        post: req.body,
+      });
+    }
 
     const post = new PostModel({
       title: req.body.title,
@@ -174,17 +190,11 @@ export const user_message_post = [
       user: req.user._id,
     });
 
-    if (!errors.isEmpty()) {
-      res.render("messageform", {
-        title: "Post a Message",
-        user: req.user,
-        errors: errors.array(),
-        post: post,
-      });
-      return;
-    } else {
+    try {
       await post.save();
       res.redirect("/");
-    }
+    } catch(err) {
+      return next(err);
+    } 
   }),
 ];
