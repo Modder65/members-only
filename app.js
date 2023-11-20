@@ -36,5 +36,7 @@ app.use(express.urlencoded({ extended: false })); // Parse URL-encoded bodies
 // Initialize Routes
 app.use("/", indexRouter);
 
+const PORT = process.env.PORT || 3000; //Fallback to 3000 for local development
+
 // Start server on port 3000
-app.listen(3000, () => console.log("app listening on port 3000."));
+app.listen(PORT, () => console.log(`app listening on port ${PORT}`));
