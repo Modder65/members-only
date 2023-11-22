@@ -51,6 +51,16 @@ passport.deserializeUser(async (id, done) => {
   };
 });
 
+// Configure Nodemailer to use Elastic Email's SMTP
+const transporter = nodemailer.createTransport({
+  host: process.env.HOST,
+  port: process.env.EMAILPORT,
+  auth: {
+    user: process.env.USER,
+    pass: process.env.PASS
+  }
+});
+
 // Verification Code Generator
 function generateRandomVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000);
@@ -105,42 +115,36 @@ export const user_signup_post = [
 
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      const verificationCode = generateRandomVerificationCode();
 
       const user = new UserModel({
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
+        verificationCode,
+        isVerified: false,
       });
+      
+      await user.save();
 
-      // Generate a random verification code
-      const verificationCode = generateRandomVerificationCode();
-
-      // Update the user with the erification code and set isVerified to false
-      user.verificationCode = verificationCode;
-      user.isVerified = false;
-
-      const savedUser = await user.save();
-
-      // Define the email content 
-      const emailContent = {
-        apikey: process.env.EMAILAPIKEY,
-        subject: "Email Verification",
-        from: process.env.FROMEMAIL,
+      // Define the email content for Nodemailer
+      const mailOptions = {
+        from: process.env.FROM_EMAIL,
         to: user.email,
-        bodyHtml: `Your verification code is ${verificationCode}`,
-        bodyText: `Your verification code is ${verificationCode}`,
-        isTransactional: true,
+        subject: "Email Verification",
+        text: `Your verification code is ${verificationCode}`,
+        html: `<p>Your verification code is <b>${verificationCode}</b></p>`
       };
 
-      // Make an HTTP POST request to Elastic Email API to send the email
-      try {
-        const response = await axios.post(process.env.EMAILURL, emailContent);
-        console.log("API Response:", response.data);
-      } catch (error) {
-        console.error("Error sending email:", error.response.data);
-      }
+      // Send the email 
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error sending email:", error);
+        } else {
+          console.log("Verification email sent:", info.response);
+        }
+      });
 
-      console.log("Verification email sent to:", user.email);
       res.redirect("/verification");
     } catch(err) {
       return next(err);
