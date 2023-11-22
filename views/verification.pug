@@ -6,9 +6,6 @@ block content
       p Verification email has been sent. Please enter the verification code below to verify your account.
       form.verification-form(action='/verification' method='POST') 
         div.form-group 
-          label(for="verificationemail") Email
-          input(type='email', name='verificationemail', id='verificationemail', required=true)
-        div.form-group 
           label(for="code") Code
           input(type='text', name='code', id='code', required=true) 
-      button(type='submit') Verify
+      button.verification-form-button(type='submit') Verify

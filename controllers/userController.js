@@ -236,15 +236,9 @@ export const user_verification_get = (req, res, next) => {
 };
 
 export const user_verification_post = asyncHandler(async (req, res, next) => {
-  const { verificationemail, code } = req.body; // Notice the name 'verificationemail'
-
   try {
-    const user = await UserModel.findOne({ email: verificationemail });
-    if (!user) {
-      // User not found
-      return res.render("verification", { error: "User not found." });
-    }
-
+    const user = await UserModel.findOne({ email: email });
+   
     if (req.body.code === user.verificationCode) {
       // Verification code matches
       await UserModel.findByIdAndUpdate(user._id, { isVerified: true });

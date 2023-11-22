@@ -224,7 +224,7 @@ footer {
   gap: 25px;
 }
 
-.message-form-button {
+.message-form-button, .verification-form-button {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
