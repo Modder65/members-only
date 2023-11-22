@@ -29,7 +29,7 @@ app.set("view engine", "pug"); // Set up Pug for templating
 // Render static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-const RedisStore = connectRedis(session);
+const RedisStore = connectRedis.default(session);
 
 const redisClient = redis.createClient({
   password: process.env.REDIS_PASSWORD,
