@@ -3,6 +3,7 @@ import { body, validationResult } from "express-validator";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 import { DateTime } from "luxon";
 import "dotenv/config";
 import UserModel from "../models/user.js";
@@ -48,6 +49,11 @@ passport.deserializeUser(async (id, done) => {
     done(err);
   };
 });
+
+// Verification Code Generator
+function generateRandomVerificationCode() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
 
 export const index = asyncHandler(async (req, res, next) => {
   try {
@@ -103,9 +109,46 @@ export const user_signup_post = [
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
+
       });
 
+      // Generate a random verification code
+      const verificationCode = generateRandomVerificationCode();
+
+      // Update the user with the erification code and set isVerified to false
+      user.verificationCode = verificationCode;
+      user.isVerified = false;
+
       const savedUser = await user.save();
+
+      // Create a Nodemailer transporter with SMTP settings
+      const transporter = nodemailer.createTransport({
+        host: process.env.HOST,
+        port: process.env.EMAILPORT,
+        secure: true,
+        auth: {
+          user: process.env.EMAILUSER,
+          pass: process.env.EMAILPASS
+        }
+      });
+
+      // Define the email content 
+      const mailOptions = {
+        from: process.env.EMAILUSER,
+        to: user.email, // recipients email
+        subject: "Email Verification",
+        text: `Your verification code is ${verificationCode}`,
+      };
+      
+      // Send the verification email
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error sending verification email:", error);
+        } else {
+          console.log("Verification email sent: %s", info.messageId);
+          res.redirect("/verification");
+        }
+      });
 
       req.login(savedUser, (err) => {
         if (err) {
@@ -198,3 +241,35 @@ export const user_message_post = [
     } 
   }),
 ];
+
+export const user_verification_get = (req, res, next) => {
+  res.render("verification", {
+    user: req.user._id,
+  });
+};
+
+export const user_verification_post = [
+  body("title")
+    .trim()
+    .isLength({ min: 6 })
+    .escape()
+    .withMessage("Verification code must be specified."),
+
+  asyncHandler(async (req, res, next) => {
+    const user = await UserModel.findOne({ email: email });
+
+    if (req.body.code === user.verificationCode) {
+      try {
+        await UserModel.findByIdAndUpdate(req.user._id, { isVerified: true });
+        res.redirect("/");
+      } catch(err) {
+        return next(err);
+      }
+    } else {
+      res.render("verification", { user: req.user, error: "Incorrect verification code." });
+    }
+  }),
+];
+  
+
+  
