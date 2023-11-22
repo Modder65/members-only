@@ -4,7 +4,6 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
-import axios from "axios";
 import { DateTime } from "luxon";
 import "dotenv/config";
 import UserModel from "../models/user.js";
@@ -236,52 +235,34 @@ export const user_verification_get = (req, res, next) => {
   res.render("verification");
 };
 
-export const user_verification_post = [
-  body("code")
-    .trim()
-    .isLength({ min: 6 })
-    .escape()
-    .withMessage("Verification code must be specified."),
+export const user_verification_post = asyncHandler(async (req, res, next) => {
+  const { email, code } = req.body;
 
-  asyncHandler(async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.render("verification", {
-        errors: errors.array(),
-        user: req.user // or null if not logged in
+  try {
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      // Handle case where no user is found
+      return res.render("verification", { error: "User not found." });
+    }
+
+    if (user.verificationCode === code) {
+      // Code matches, user is verified
+      await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
+
+      // Optional: Log the user in and redirect
+      req.login(user, (err) => {
+        if (err) return next(err);
+        return res.redirect("/");
       });
+    } else {
+      // Code does not match
+      res.render("verification", { error: "Incorrect verification code." });
     }
+  } catch (err) {
+    return next(err);
+  }
+});
 
-    try {
-      const user = await UserModel.findOne({ email: req.body.email });
-
-      if (!user) {
-        return res.render("verification", {
-          error: "User not found.",
-          user: req.user // or null
-        });
-      }
-
-      if (req.body.code === user.verificationCode) {
-        await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
-
-        // Optionally log the user in after verification
-        req.login(user, (err) => {
-          if (err) return next(err);
-          return res.redirect("/");
-        });
-      } else {
-        res.render("verification", {
-          error: "Incorrect verification code.",
-          user: req.user // or null
-        });
-      }
-    } catch (err) {
-      console.error("Verification error:", err);
-      return next(err);
-    }
-  }),
-];
 
   
 

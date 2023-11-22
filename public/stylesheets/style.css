@@ -122,7 +122,7 @@ h1 {
   cursor: pointer;
 }
 
-.signup-form, .login-form {
+.signup-form, .login-form, .verification-form {
   display: flex;
   flex-direction: column;
   gap: 25px;
