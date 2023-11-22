@@ -2,10 +2,10 @@ import express from "express";
 import session from "express-session";
 import redis from "redis";
 import connectRedis from "connect-redis";
-import MongoStore from "connect-mongo";
+// Removed MongoStore import as it's not used here
 import passport from "passport";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname } from "path";
 import path from "path";
 import mongoose from "mongoose";
 import "dotenv/config";
@@ -24,12 +24,12 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.set('views', path.join(__dirname, 'views'));
-app.set("view engine", "pug"); // Set up Pug for templating
+app.set("view engine", "pug");
 
-// Render static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-const RedisStore = connectRedis.default(session);
+// Create an instance of RedisStore
+const RedisStore = connectRedis(session);
 
 const redisClient = redis.createClient({
   password: process.env.REDIS_PASSWORD,
@@ -43,25 +43,19 @@ redisClient.on('error', function(err) {
   console.error('Redis error: ' + err);
 });
 
-// Set up session middleware with a secret and MongoDB store
 app.use(session({
-  secret: process.env.SESSION_SECRET || "secret", 
+  secret: process.env.SESSION_SECRET || "secret",
   resave: false,
   saveUninitialized: false,
   store: new RedisStore({ client: redisClient }),
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // Optional, cookie will expire after 24 hours
+  cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.urlencoded({ extended: false }));
 
-// Set up Passport middleware
-app.use(passport.initialize()); // Initialize Passport
-app.use(passport.session()); // Enable Passport persistent sessions
-app.use(express.urlencoded({ extended: false })); // Parse URL-encoded bodies
-
-// Initialize Routes
 app.use("/", indexRouter);
 
 const PORT = process.env.PORT || 3000;
-
-// Start server on port 3000
 app.listen(PORT, () => console.log(`App listening on port ${PORT}`));
