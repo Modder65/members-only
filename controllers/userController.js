@@ -245,7 +245,7 @@ export const user_verification_post = asyncHandler(async (req, res, next) => {
       return res.render("verification", { error: "User not found." });
     }
 
-    if (user.verificationCode === code) {
+    if (req.body.code === user.verificationCode) {
       // Verification code matches
       await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
 
