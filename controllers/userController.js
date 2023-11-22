@@ -123,12 +123,12 @@ export const user_signup_post = [
 
       // Define the email content 
       const emailContent = {
-        apiKey: process.env.EMAILAPIKEY,
+        apikey: process.env.EMAILAPIKEY,
         subject: "Email Verification",
-        fromEmail: process.env.FROMEMAIL,
-        toEmail: user.email,
-        htmlBody: `Your verification code is ${verificationCode}`,
-        textBody: `Your verification code is ${verificationCode}`,
+        from: process.env.FROMEMAIL,
+        to: user.email,
+        bodyHtml: `Your verification code is ${verificationCode}`,
+        bodyText: `Your verification code is ${verificationCode}`,
         isTransactional: true,
       };
 
