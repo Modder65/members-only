@@ -237,32 +237,52 @@ export const user_verification_get = (req, res, next) => {
 };
 
 export const user_verification_post = [
-  body("code") // fix later change to code
+  body("code")
     .trim()
     .isLength({ min: 6 })
     .escape()
     .withMessage("Verification code must be specified."),
 
   asyncHandler(async (req, res, next) => {
-    const user = await UserModel.findById(req.user._id);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render("verification", {
+        errors: errors.array(),
+        user: req.user // or null if not logged in
+      });
+    }
 
-    if (req.body.code === user.verificationCode) {
-      try {
-        await UserModel.findByIdAndUpdate(req.user._id, { isVerified: true });
-        req.login(savedUser, (err) => {
-          if (err) {
-            return next(err);
-          }
-          return res.redirect("/");
-          });
-      } catch(err) {
-        return next(err);
+    try {
+      const user = await UserModel.findOne({ email: req.body.email });
+
+      if (!user) {
+        return res.render("verification", {
+          error: "User not found.",
+          user: req.user // or null
+        });
       }
-    } else {
-      res.render("verification", { user: req.user, error: "Incorrect verification code." });
+
+      if (req.body.code === user.verificationCode) {
+        await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
+
+        // Optionally log the user in after verification
+        req.login(user, (err) => {
+          if (err) return next(err);
+          return res.redirect("/");
+        });
+      } else {
+        res.render("verification", {
+          error: "Incorrect verification code.",
+          user: req.user // or null
+        });
+      }
+    } catch (err) {
+      console.error("Verification error:", err);
+      return next(err);
     }
   }),
 ];
+
   
 
   
