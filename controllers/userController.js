@@ -124,7 +124,10 @@ export const user_signup_post = [
         isVerified: false,
       });
       
-      await user.save();
+      const savedUser = await user.save();
+
+      // Store the user's ID in the session
+      req.session.userId = savedUser._id;
 
       // Define the email content for Nodemailer
       const mailOptions = {
@@ -237,13 +240,20 @@ export const user_verification_get = (req, res, next) => {
 
 export const user_verification_post = asyncHandler(async (req, res, next) => {
   try {
-    const user = await UserModel.findOne({ email: email });
+    const userId = req.session.userId;
+    if (!userId) {
+      return res.render("verification", { error: "Session expired or invalid."});
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.render("verfication", { error: "User not found."});
+    }
    
     if (req.body.code === user.verificationCode) {
       // Verification code matches
       await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
 
-      // Optional: Log the user in and redirect
       req.login(user, (err) => {
         if (err) return next(err);
         return res.redirect("/");
