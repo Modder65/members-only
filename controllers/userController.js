@@ -236,17 +236,17 @@ export const user_verification_get = (req, res, next) => {
 };
 
 export const user_verification_post = asyncHandler(async (req, res, next) => {
-  const { email, code } = req.body;
+  const { verificationemail, code } = req.body; // Notice the name 'verificationemail'
 
   try {
-    const user = await UserModel.findOne({ email: email });
+    const user = await UserModel.findOne({ email: verificationemail });
     if (!user) {
-      // Handle case where no user is found
+      // User not found
       return res.render("verification", { error: "User not found." });
     }
 
     if (user.verificationCode === code) {
-      // Code matches, user is verified
+      // Verification code matches
       await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
 
       // Optional: Log the user in and redirect
@@ -255,13 +255,15 @@ export const user_verification_post = asyncHandler(async (req, res, next) => {
         return res.redirect("/");
       });
     } else {
-      // Code does not match
+      // Verification code does not match
       res.render("verification", { error: "Incorrect verification code." });
     }
   } catch (err) {
+    console.error(err);
     return next(err);
   }
 });
+
 
 
   
