@@ -19,4 +19,8 @@ router.get("/message-form", user_controller.user_message_get);
 
 router.post("/message-form", user_controller.user_message_post);
 
+router.get("/verification", user_controller.user_verification_get);
+
+router.post("/verification", user_controller.user_verification_post);
+
 export default router;
