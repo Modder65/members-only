@@ -240,46 +240,33 @@ export const user_verification_get = (req, res, next) => {
 
 export const user_verification_post = asyncHandler(async (req, res, next) => {
   try {
-    console.log("Verification POST Request Body:", req.body);  // Log the received request body
-
     const userId = req.session.userId;
-    console.log("User ID from session:", userId);  // Log the user ID from the session
-
     if (!userId) {
-      console.log("No user ID in session");
-      return res.render("verification", { error: "Session expired or invalid." });
+      return res.render("verification", { error: "Session expired or invalid."});
     }
 
     const user = await UserModel.findById(userId);
-    console.log("User found:", user);  // Log the retrieved user object
-
     if (!user) {
-      console.log("No user found with the session ID");
-      return res.render("verification", { error: "User not found." });
+      return res.render("verification", { error: "User not found."});
     }
-
+   
     if (req.body.code === user.verificationCode) {
-      console.log("Verification code matches");
+      // Verification code matches
       await UserModel.findByIdAndUpdate(user._id, { isVerified: true });
 
       req.login(user, (err) => {
-        if (err) {
-          console.error("Error during login:", err);
-          return next(err);
-        }
-        console.log("User logged in successfully");
+        if (err) return next(err);
         return res.redirect("/");
       });
     } else {
-      console.log("Verification code does not match");
+      // Verification code does not match
       res.render("verification", { error: "Incorrect verification code." });
     }
   } catch (err) {
-    console.error("Error in verification process:", err);
+    console.error(err);
     return next(err);
   }
 });
-
 
 
 
