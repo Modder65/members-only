@@ -1,8 +1,6 @@
 import express from "express";
 import session from "express-session";
-import redis from "redis";
-import connectRedis from "connect-redis";
-// Removed MongoStore import as it's not used here
+import MongoStore from "connect-mongo";
 import passport from "passport";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -28,27 +26,15 @@ app.set("view engine", "pug");
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Create an instance of RedisStore
-const RedisStore = connectRedis(session);
-
-const redisClient = redis.createClient({
-  password: process.env.REDIS_PASSWORD,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-  }
-});
-
-redisClient.on('error', function(err) {
-  console.error('Redis error: ' + err);
-});
-
+// Set up session middleware with MongoDB store
 app.use(session({
   secret: process.env.SESSION_SECRET || "secret",
   resave: false,
   saveUninitialized: false,
-  store: new RedisStore({ client: redisClient }),
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  store: MongoStore.create({ 
+    mongoUrl: process.env.MONGO_URI
+  }),
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // Optional, cookie will expire after 24 hours
 }));
 
 app.use(passport.initialize());
