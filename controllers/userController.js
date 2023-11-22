@@ -133,7 +133,12 @@ export const user_signup_post = [
       };
 
       // Make an HTTP POST request to Elastic Email API to send the email
-      await axios.post(process.env.EMAILURL, emailContent);
+      try {
+        const response = await axios.post(process.env.EMAILURL, emailContent);
+        console.log("API Response:", response.data);
+      } catch (error) {
+        console.error("Error sending email:", error.response.data);
+      }
 
       console.log("Verification email sent to:", user.email);
       res.redirect("/verification");
@@ -235,7 +240,7 @@ export const user_verification_post = [
     .withMessage("Verification code must be specified."),
 
   asyncHandler(async (req, res, next) => {
-    const user = await UserModel.findOne({ email: email });
+    const user = await UserModel.findById(req.user._id);
 
     if (req.body.code === user.verificationCode) {
       try {
