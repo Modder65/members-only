@@ -109,7 +109,6 @@ export const user_signup_post = [
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
-
       });
 
       // Generate a random verification code
@@ -236,13 +235,11 @@ export const user_message_post = [
 ];
 
 export const user_verification_get = (req, res, next) => {
-  res.render("verification", {
-    user: req.user._id,
-  });
+  res.render("verification");
 };
 
 export const user_verification_post = [
-  body("title")
+  body("code") // fix later change to code
     .trim()
     .isLength({ min: 6 })
     .escape()
