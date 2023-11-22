@@ -4,6 +4,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
+import axios from "axios";
 import { DateTime } from "luxon";
 import "dotenv/config";
 import UserModel from "../models/user.js";
@@ -120,34 +121,22 @@ export const user_signup_post = [
 
       const savedUser = await user.save();
 
-      // Create a Nodemailer transporter with SMTP settings
-      const transporter = nodemailer.createTransport({
-        host: process.env.HOST,
-        port: process.env.EMAILPORT,
-        secure: true,
-        auth: {
-          user: process.env.EMAILUSER,
-          pass: process.env.EMAILPASS
-        }
-      });
-
       // Define the email content 
-      const mailOptions = {
-        from: process.env.EMAILUSER,
-        to: user.email, // recipients email
+      const emailContent = {
+        apiKey: process.env.EMAILAPIKEY,
         subject: "Email Verification",
-        text: `Your verification code is ${verificationCode}`,
+        fromEmail: process.env.FROMEMAIL,
+        toEmail: user.email,
+        htmlBody: `Your verification code is ${verificationCode}`,
+        textBody: `Your verification code is ${verificationCode}`,
+        isTransactional: true,
       };
-      
-      // Send the verification email
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error("Error sending verification email:", error);
-        } else {
-          console.log("Verification email sent: %s", info.messageId);
-          res.redirect("/verification");
-        }
-      });
+
+      // Make an HTTP POST request to Elastic Email API to send the email
+      await axios.post(process.env.EMAILURL, emailContent);
+
+      console.log("Verification email sent to:", user.email);
+      res.redirect("/verification");
     } catch(err) {
       return next(err);
     };
