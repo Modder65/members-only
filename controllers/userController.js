@@ -149,13 +149,6 @@ export const user_signup_post = [
           res.redirect("/verification");
         }
       });
-
-      req.login(savedUser, (err) => {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect("/");
-        });
     } catch(err) {
       return next(err);
     };
@@ -261,7 +254,12 @@ export const user_verification_post = [
     if (req.body.code === user.verificationCode) {
       try {
         await UserModel.findByIdAndUpdate(req.user._id, { isVerified: true });
-        res.redirect("/");
+        req.login(savedUser, (err) => {
+          if (err) {
+            return next(err);
+          }
+          return res.redirect("/");
+          });
       } catch(err) {
         return next(err);
       }
